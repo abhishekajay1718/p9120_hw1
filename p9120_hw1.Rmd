@@ -1,0 +1,63 @@
+---
+title: "P9120 HW 1"
+author: "Abhishek Ajay"
+date: "10/2/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(knitr)
+```
+
+## Problem 2 
+
+We perform best subset, forward stepwise, and backward stepwise selection on a single data set. For each approach, we obtain p + 1 models, containing *0,1,2,...,p* predictors. **Explain your answers**:
+
+**(a) Which of the three models with k predictors has the smallest training RSS?** 
+    
+    Forward stepwise and Backward stepwise selection do not consider all possible models but constructs a model by adding or removing one predictor at a time. This results in a *greedy* approach. 
+     
+     The *best subset selection* will consider all the models considered by forward and backward step selection since it assess literally all the models and gives back all of them with summary statistics. Although it is much more time consuming, especially for larger model it will still be the one that selects the model with the lowest training RSS value.
+
+**(b) Which of the three models with k predictors has the smallest test RSS?**
+
+    Since all the three selection algorithms work on the given data, we can tell which one will give the model with the lowest *training RSS*. However, there is no way of telling whether it will have the lowest *test RSS* too. Furthermore, it is actually not possible to tell which of the three methods will give a model with the lowest *test RSS*. This is a form of data dredging since we are confirming the model based on the training data itself and not testing it on a test data. This is because the variables itself are random variables that contain error terms in them as well.  
+    
+    This variation in error terms basically makes it tough to say if the model with the lowest training RSS will also have the lowest test RSS. In the case of an overfitted model, we might get the lowest trainign RSS but that means that the variation of the model is very high and if the test case is even slightly different (which it will be since they are all random variables) it will result in very different and (at most times) higher test RSS.
+
+(c) True or False: 
+    
+    i. The predictors in the k-variable model identiﬁed by forward stepwise are a subset of the predictors in the (k+1)-variable model identiﬁed by forward stepwise selection. 
+    
+    + **True.** This is because in forward stepwise selection we don't drop any previously selected predictor hence the k+1 variable model will have the k-variable model as its subset.
+    
+    ii. The predictors in the k-variable model identiﬁed by backward stepwise are a subset of the predictors in the (k + 1)variable model identiﬁed by backward stepwise selection. 
+    
+    + **True** We start with the full model hence the k+1 variable model had the k variable model in it when starting the selection. Therefore, the second step in the backward selection when you start with k+1 variables will give the same k variable model for the lowest training RSS.
+    
+    iii. The predictors in the k-variable model identiﬁed by backward stepwise are a subset of the predictors in the (k + 1)variable model identiﬁed by forward stepwise selection. 
+    
+    + **False.** This is not always true. This is because forward selection starts with an empty model and keeps adding a single predictor each time to check for lowest RSS, however, the backward model depends on the combined effects of predictors in resulting the lowest RSS and hence the k-variable model identified by backward stepise won't always be a subset of the predictors in this scenario.
+    
+    iv. The predictors in the k-variable model identiﬁed by forward stepwise are a subset of the predictors in the (k+1)-variable model identiﬁed by backward stepwise selection. 
+    
+    + **False.** The reason's similar to the above since they start differently looking for different ways of lowest training RSS.
+    
+    v. The predictors in the k-variable model identiﬁed by best subset are a subset of the predictors in the (k + 1)-variable model identiﬁed by best subset selection.
+    
+    + **False.** Best subset selection, unlike the other two stepwise method is capable of dropping previously chosen predictors even when a new one is added. Hence, k-varaible model might not necessarily be a subset of the k+1 variable model since that extra variable might result in one of the predictors from the k variable model to be dropped.
+
+## Problem 3
+
+Derive the entries in Table 3.4, the explicit forms for estimators in the orthogonal case.
+
+So the table 3.4 in ESL Chapter 3, page 71 is
+
+
+|Estimator | Formula|
+|----------------------|-----------------------------------------------------|
+| Best subset (size M) | $\hat\beta_{j}.I(|\hat\beta_{j} >= |\hat\beta_{M}|)$|
+|Ridge|$\hat\beta_{j}/(1 + \lambda)$|
+|Lasso|$sign(\hat\beta_{j})(|\hat\beta_{j} - \lambda|)_{+}$|
