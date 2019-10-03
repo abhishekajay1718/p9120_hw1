@@ -61,3 +61,4 @@ So the table 3.4 in ESL Chapter 3, page 71 is
 | Best subset (size M) | $\hat\beta_{j}.I(|\hat\beta_{j} >= |\hat\beta_{M}|)$|
 |Ridge|$\hat\beta_{j}/(1 + \lambda)$|
 |Lasso|$sign(\hat\beta_{j})(|\hat\beta_{j} - \lambda|)_{+}$|
+
