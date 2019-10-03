@@ -9,6 +9,8 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(knitr)
+library(glmnet)
+library(leaps)
 ```
 
 ## Problem 2 
@@ -61,4 +63,54 @@ So the table 3.4 in ESL Chapter 3, page 71 is
 | Best subset (size M) | $\hat\beta_{j}.I(|\hat\beta_{j} >= |\hat\beta_{M}|)$|
 |Ridge|$\hat\beta_{j}/(1 + \lambda)$|
 |Lasso|$sign(\hat\beta_{j})(|\hat\beta_{j} - \lambda|)_{+}$|
+
+## Problem 4
+
+The data here comes from a study by Stamey et al. (1989). They examined the correlation between the level of prostate-speciﬁc antigen and a number of clinical measures in men who were about to receive a radical prostatectomy. The variables are log cancer volume (lcavol), log prostate weight (lweight), age, log of the amount of benign prostatic hyperplasia (lbph), seminal vesicle invasion (svi), log of capsular penetration (lcp), Gleason score (gleason), and percent of Gleason scores 4 or 5 (pgg45)
+```{r}
+## Here I use the method adapted from ISLR page 250
+prostate_df = read.table("prostate.data")
+
+# partition the original data into training and testing datasets
+train <- subset( prostate_df, train==TRUE )[,1:9]
+test  <- subset( prostate_df, train==FALSE)[,1:9]  
+
+# standardization of predictors
+#trainst <- train
+#for(i in 1:8) {
+#  trainst[,i] <- trainst[,i] - mean(prostate_df[,i]);
+#  trainst[,i] <- trainst[,i]/sd(prostate_df[,i]);
+#}
+
+#testst <- test
+#for(i in 1:8) {
+#  testst[,i] <- testst[,i] - mean(prostate_df[,i]);
+#  testst[,i] <- testst[,i]/sd(prostate_df[,i]);
+#}
+predict.regsubsets = function(object, newdata, id, ...) {
+    form = as.formula(object$call[[2]])
+    mat = model.matrix(form, newdata)
+    coefi = coef(object, id = id)
+    mat[, names(coefi)] %*% coefi
+}
+#a best-subset linear regression with k chosen by 5 fold CV
+k = 5
+set.seed(1)
+folds = sample(1:k, nrow(train), replace = TRUE)
+cv.errors = matrix(NA, k, 8, dimnames = list(NULL, paste(1:8)))
+
+for(j in 1:k){
+  best.fit = regsubsets(lpsa ~., data = train[folds != j,],
+                        nvmax = 8)
+  for( i in 1:8){
+    pred = predict.regsubsets(best.fit, train[folds == j,], id = i)
+    cv.errors[j,i] = mean((train$lpsa[folds == j] - pred)^2)
+  }
+}
+mean.cv.errors = apply(cv.errors, 2, mean)
+mean.cv.errors
+par(mfrow = c(1,1))
+plot(mean.cv.errors, type = 'b')
+
+```
 
